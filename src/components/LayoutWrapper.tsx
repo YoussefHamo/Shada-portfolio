@@ -24,7 +24,7 @@ export default function LayoutWrapper({
             fontSize: "12px",
           }}
         >
-          © 2026 YousseF Hamo. All rights reserved.
+          © 2026 ShadaAllam. All rights reserved.
         </div>
       )}
     </>
