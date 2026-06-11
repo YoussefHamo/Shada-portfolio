@@ -78,21 +78,27 @@ export default function AddProjectModal({
       const uploadedUrls: string[] = [];
 
       for (const image of images) {
-        const fileName = `${Date.now()}-${Math.random()}-${image.name}`;
+        const filePath = `1iiiiika_0/${Date.now()}_${image.name}`;
 
-        const { error: uploadError } =
+        const { data: uploadData, error: uploadError } =
           await supabase.storage
             .from("projects")
-            .upload(fileName, image);
+            .upload(filePath, image);
 
-        if (uploadError) continue;
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          continue;
+        }
 
-        const { data } = supabase.storage
+        const { data: urlData } = supabase.storage
           .from("projects")
-          .getPublicUrl(fileName);
+          .getPublicUrl(uploadData.path);
 
-        uploadedUrls.push(data.publicUrl);
+        uploadedUrls.push(urlData.publicUrl);
       }
+
+      const technologiesArray = tech ? tech.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const featuresArray = features ? features.split(',').map(f => f.trim()).filter(Boolean) : [];
 
       const { data, error } = await supabase
         .from("projects")
@@ -102,10 +108,10 @@ export default function AddProjectModal({
             description: desc,
             live_url: live || null,
             github_url: github || null,
-            technologies: tech,
-            key_features: features,
+            technologies: technologiesArray,
+            key_features: featuresArray,
             image_url: uploadedUrls[0] || null,
-            image_urls: uploadedUrls,
+            image_urls: uploadedUrls.length > 0 ? JSON.stringify(uploadedUrls) : "[]",
           },
         ])
         .select()

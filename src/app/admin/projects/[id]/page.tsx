@@ -39,7 +39,11 @@ export default function ProjectDetailPage() {
       .single();
 
     setProject(data);
-    setForm(data);
+    setForm({
+      ...data,
+      technologies: Array.isArray(data?.technologies) ? data.technologies.join(", ") : (data?.technologies || ""),
+      key_features: Array.isArray(data?.key_features) ? data.key_features.join(", ") : (data?.key_features || ""),
+    });
   };
 
   const handleDelete = async () => {
@@ -85,9 +89,15 @@ export default function ProjectDetailPage() {
 };
 
   const handleUpdate = async () => {
+  const updatePayload = {
+    ...form,
+    technologies: form.technologies ? form.technologies.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+    key_features: form.key_features ? form.key_features.split(',').map((f: string) => f.trim()).filter(Boolean) : [],
+  };
+
   const { error } = await supabase
     .from("projects")
-    .update(form)
+    .update(updatePayload)
     .eq("id", id);
 
   if (!error) {
